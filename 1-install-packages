@@ -1,0 +1,38 @@
+#!/bin/bash
+
+echo "### Installing required packages and configuring system"
+
+echo "Installing  paru"
+sudo pacman -S --needed base-devel
+git clone https://aur.archlinux.org/paru.git
+cd paru
+makepkg -si
+
+echo "Installing required & desired base packages"
+paru -S --noconfirm hyprland-git polkit-kde-agent dunst grimblast wofi wofi-emoji wl-clipboard wf-recorder wlogout grimblast-git hyprpicker-git hyprpaper xdg-desktop-portal-hyprland-git ffmpegthumbnailer tumbler wtype colord imagemagick swaylock-effects qt5-wayland qt6-wayland ripgrep waybar-hyprland-git catppuccin-gtk-theme-mocha catppuccin-cursors-mocha catppuccin-mocha-grub-theme-git nwg-look cava pipewire-pulse pavucontrol ranger zsh starship neovim viewnior noise-suppression-for-voice thunar thunar-archive-plugin file-roller nerd-fonts-git vulkan-radeon lib32-vulkan-radeon steam mangohud-git lib32-mangohud-git protonup-qt corectrl zsh wezterm code discord spotify martitionmanager firefox
+
+echo "Removing intel bluetooth radeo"
+sudo touch /etc/polkit-1/rules.d/81-disable-intel-bt.rules
+sudo echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="8087", ATTRS{idProduct}=="0029", ATTR{authorized}="0"' >> /etc/polkit-1/rules.d/81-disable-intel-bt.rules
+
+echo "Setting up corectrl"
+
+echo "--configuring polkit rule"
+sudo touch /etc/polkit-1/rules.d/90-corectrl.rules
+sudo echo "polkit.addRule(function(action, subject) {" >> /etc/polkit-1/rules.d/90-corectrl.rules
+sudo echo "     if ((action.id == "org.corectrl.helper.init" ||" >> /etc/polkit-1/rules.d/90-corectrl.rules
+sudo echo "         action.id == "org.corectrl.helperkiller.init") &&" >> /etc/polkit-1/rules.d/90-corectrl.rules
+sudo echo "        subject.local == true &&" >> /etc/polkit-1/rules.d/90-corectrl.rules
+sudo echo "        subject.active == true &&" >> /etc/polkit-1/rules.d/90-corectrl.rules
+sudo echo "        subject.isInGroup("myliege")) {" >> /etc/polkit-1/rules.d/90-corectrl.rules
+sudo echo "            return polkit.Result.YES;" >> /etc/polkit-1/rules.d/90-corectrl.rules
+sudo echo "     }" >> /etc/polkit-1/rules.d/90-corectrl.rules
+sudo echo "});" >> /etc/polkit-1/rules.d/90-corectrl.rules
+
+echo "--adding 'amdgpu.ppfeaturemask=0xffffffff' to bootloader options."
+sudo sed -i '/options/ s/$/amdgpu.ppfeaturemask=0xffffffff/' /efi/loader/entries/*.conf
+
+echo "Changing shell to zsh"
+chsh /bin/zsh
+
+echo "Congradulations, task complete!"

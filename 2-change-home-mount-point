@@ -1,0 +1,4 @@
+#!/bin/zsh
+
+echo "Changing the /home directory mount location to the btrfs subvolume on the 1.7TiB partition in fstab"
+sudo sed -i "/@home/c UUID=2e8b0fa2-be26-45dc-a19a-9bcfec2efd7f /home          btrfs   subvol=/@home,defaults,noatime,compress=zstd 0 0" /etc/fstab
